@@ -1,6 +1,10 @@
-from types import *
+import copy
+from typing import List, Dict
 
 import pydot
+
+from afd_types import State, Symbol, Transitions, StateGraph, DistinctionTable
+from utils import dfs
 
 
 class Afd:
@@ -146,8 +150,8 @@ class Afd:
           J J J
         """
         table: DistinctionTable = {}
-        column_i = self.states[:-1] # Pega todos menos o último estado
-        line_j = self.states[1:] # Pega todos menos o primeiro estado
+        column_i = self.states[:-1]  # Pega todos menos o último estado
+        line_j = self.states[1:]  # Pega todos menos o primeiro estado
 
         # inicializa tabela de distincão
         for index in range(len(line_j)):
@@ -271,11 +275,4 @@ class Afd:
 
         graph_txt += '}'
         graph = pydot.graph_from_dot_data(graph_txt)[0]
-        graph.write_png(f'{name}.png')
-
-
-def dfs(visited, graph, node):
-    if node not in visited:
-        visited.add(node)
-        for neighbour in graph[node]:
-            dfs(visited, graph, neighbour)
+        graph.write_png(f'./images/{name}.png')
