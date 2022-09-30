@@ -1,7 +1,7 @@
 import os.path
 import tkinter as tk
 from tkinter import filedialog
-from typing import Tuple, Optional, IO, List
+from typing import Tuple
 
 X = int
 
@@ -11,23 +11,23 @@ Coord = Tuple[X, Y]
 
 
 class FileButton:
-    PAD = 6
-    name: str = "Selecionar o arquivo "
-    label: tk.Label = None
-    button: tk.Button = None
-    master: tk.Tk = None
-    file: Optional[IO] = None
-    update_subject = None
+    __PAD = 6
+    # name: str = "Selecionar o arquivo "
+    # label: tk.Label = None
+    # button: tk.Button = None
+    # master: tk.Tk = None
+    # file: Optional[IO] = None
+    # update_subject = None
 
     def __init__(self, name_complement: str, master: tk.Tk, coord: Coord, update_subject):
         self.master = master
-        self.name += name_complement
+        self.name = "Selecionar o arquivo " + name_complement
 
-        self.label = tk.Label(self.master, text=self.name, padx=FileButton.PAD, pady=FileButton.PAD)
+        self.label = tk.Label(self.master, text=self.name, padx=FileButton.__PAD, pady=FileButton.__PAD)
         self.label.grid(column=coord[1], row=coord[0])
 
         self.button = tk.Button(self.master, text="Carregar", command=self.open_dialog)
-        self.button.grid(column=coord[1] + 1, row=coord[0], padx=FileButton.PAD, pady=FileButton.PAD)
+        self.button.grid(column=coord[1] + 1, row=coord[0], padx=FileButton.__PAD, pady=FileButton.__PAD)
 
         self.update_subject = update_subject
 
@@ -39,11 +39,11 @@ class FileButton:
 
 
 class Gui:
-    window: tk.Tk = None
-    file_afd: FileButton = None
-    file_words: FileButton = None
-    start = None
-    file_subject: List[FileButton] = []
+    # window: tk.Tk = None
+    # file_afd: FileButton = None
+    # file_words: FileButton = None
+    # start = None
+    # file_subject: List[FileButton] = []
 
     def __init__(self, start):
         self.start = start
@@ -52,7 +52,7 @@ class Gui:
 
         self.file_afd = FileButton("do AFD", self.window, (0, 0), self.update_subject)
         self.file_words = FileButton("da lista de palavras", self.window, (1, 0), self.update_subject)
-        self.file_subject.extend([self.file_afd, self.file_words])
+        self.file_subject = [self.file_afd, self.file_words]
 
         self.start = tk.Button(self.window, text="Iniciar", state=tk.DISABLED, command=start)
         self.start.grid(column=0, row=2)
