@@ -1,5 +1,7 @@
 from afd import Afd
 
+from types import *
+
 if __name__ == '__main__':
     M = 'AFDexemplo1'
     S = ['q0', 'q1', 'q2', 'q3']
@@ -38,6 +40,7 @@ if __name__ == '__main__':
          ('q2', 'T', 'q2'), ('q2', 'F', 'q3'), ('q3', 'A', 'q2'), ('q3', 'Z', 'q3'), ('q3', 'T', 'q3'),
          ('q3', 'L', 'q4'), ('q4', 'A', 'q2'), ('q4', 'Z', 'q4'), ('q4', 'T', 'q4'), ('q4', 'L', 'q4')]
     My_Afd = Afd(M, S, A, i, F, T)
+
     accepted_words_list = ['ACFL', 'ZTACFL', 'LACFLL', 'AZCTFL', 'LZT']
     rejected_words_list = ['AR', 'ACFR', 'F', 'ACA', 'ACL']
     print(My_Afd.validate_words(accepted_words_list))
