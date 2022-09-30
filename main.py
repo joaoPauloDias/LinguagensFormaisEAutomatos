@@ -1,5 +1,8 @@
 import pydot
+import copy
 
+
+# dfs simples
 def dfs(visited, graph, node):
     if node not in visited:
         visited.add(node)
@@ -78,7 +81,7 @@ class Afd:
     def check_total(self):
         # para cada estado do afd
         for state in self.states:
-            # pega os caracteres das transicoes que tem como o origem o estado atual
+            # pega os caracteres das transicoes que tem como a origem o estado atual
             filtered = [transition[1] for transition in self.transitions if transition[0] == state]
             # e ve se esses caracteres correspondem a totalidade dos simbolos do alfabeto aceito
             not_included = list(filter(lambda char: char not in filtered, self.alphabet))
@@ -98,7 +101,7 @@ class Afd:
             self.states.append('dump')
         # para cada estado do automato
         for state in self.states:
-            # pega os caracteres das transicoes que tem como o origem o estado atual
+            # pega os caracteres das transicoes que tem como a origem o estado atual
             filtered = [transition[1] for transition in self.transitions if transition[0] == state]
             # e pega todos simbolos do alfabeto que nao estao nessaa lista
             not_included = list(filter(lambda symbol: symbol not in filtered, self.alphabet))
@@ -118,12 +121,20 @@ class Afd:
                     # e marca todas as celulas que contem a celula recem marcada
                     self.mark_distinct_table(table, key, key_aux)
 
-    def find_transition(self, origem, caracter):
+    def find_transition(self, origem, symbol):
         # retorna primeira ocorrencia de transicao que contem a origem e o simbolo recebidos como parametro
         # caso ocorrencia nao existir retorna 'invalido'
         return next(
-            (transition[2] for transition in self.transitions if transition[0] == origem and transition[1] == caracter),
+            (transition[2] for transition in self.transitions if transition[0] == origem and transition[1] == symbol),
             'invalido')
+
+    def check_empty_language(self):
+        minimized_automata = copy.deepcopy(self)
+        # minimiza automato
+        minimized_automata.minimize()
+        # caso o automato minimo nao tenha nenhum estado retorna True, e vazio, caso contrario retorna False,
+        # linguagem nao vazia
+        return True if len(minimized_automata.states) == 0 else False
 
     def make_distict_table(self):
         table = {}
@@ -148,11 +159,11 @@ class Afd:
                 if not table[key][key_aux]:
                     # para cada simbolo do alfabeto
                     for character in self.alphabet:
-                        # encontra os estados destino tendo como origem os dois estados que identificam a celula (
-                        # linha e coluna)
+                        # encontra os estados destinos tendo como origem os dois estados que identificam a celula
+                        # (linha e coluna)
                         destiny_key = self.find_transition(key, character)
                         destiny_key_aux = self.find_transition(key_aux, character)
-                        # caso os estados destino sejam iguais ignora
+                        # caso os estados destinos sejam iguais ignora
                         if destiny_key == destiny_key_aux:
                             continue
                         # caso a celula esteja com linha e coluna trocadas na tabela
@@ -182,7 +193,7 @@ class Afd:
             for key_aux in table[key]:
                 # se a celula nao tiver sido marcada como distinta
                 if 'X' not in table[key][key_aux]:
-                    # assume que os estados que identificam a celula sao iguais e cria um novo estado a partir da
+                    # assume que os estados que identificam a celula sao iguais e cria estado a partir da
                     # uniao deles
                     new_state = key + key_aux
                     # troca estados anteriores pela uniao dos mesmos e substitui todas suas ocorrencias no automato
@@ -243,7 +254,7 @@ class Afd:
 
 
 if __name__ == '__main__':
-    M = 'AFD'
+    M = 'AFDexemplo1'
     S = ['q0', 'q1', 'q2', 'q3']
     A = ['a', 'b']
     i = 'q0'
@@ -251,9 +262,12 @@ if __name__ == '__main__':
     T = [('q0', 'a', 'q1'), ('q0', 'b', 'q3'), ('q1', 'a', 'q2'), ('q1', 'b', 'q1'), ('q2', 'a', 'q2'),
          ('q3', 'b', 'q2')]
     My_Afd = Afd(M, S, A, i, F, T)
-    My_Afd.minimize()
 
-    M = 'AFD'
+    My_Afd.generate_graphviz(f'{My_Afd.name}_not_minimized')
+    My_Afd.minimize()
+    My_Afd.generate_graphviz(f'{My_Afd.name}_minimized')
+
+    M = 'AFDexemplo2'
     S = ['q0', 'q1', 'q2', 'q3', 'q4', 'q5']
     A = ['a', 'b']
     i = 'q0'
@@ -262,7 +276,10 @@ if __name__ == '__main__':
          ('q2', 'b', 'q5'), ('q3', 'a', 'q5'), ('q3', 'b', 'q4'), ('q4', 'a', 'q3'), ('q4', 'b', 'q2'),
          ('q5', 'a', 'q2'), ('q5', 'b', 'q3')]
     My_Afd = Afd(M, S, A, i, F, T)
+
+    My_Afd.generate_graphviz(f'{My_Afd.name}_not_minimized')
     My_Afd.minimize()
+    My_Afd.generate_graphviz(f'{My_Afd.name}_minimized')
 
     M = 'AFDforno'
     S = ['q0', 'q1', 'q2', 'q3', 'q4']
