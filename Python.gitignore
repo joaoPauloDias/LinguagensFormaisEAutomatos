@@ -150,7 +150,7 @@ dmypy.json
 .pytype/
 
 # specific folders
-images/
+images/static/*
 
 # Cython debug symbols
 cython_debug/
