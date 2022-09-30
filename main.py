@@ -1,3 +1,5 @@
+import pydot
+
 def dfs(visited, graph, node):
     if node not in visited:
         visited.add(node)
@@ -182,21 +184,21 @@ class Afd:
                 if 'X' not in table[key][key_aux]:
                     # assume que os estados que identificam a celula sao iguais e cria um novo estado a partir da
                     # uniao deles
-                    newState = key + key_aux
+                    new_state = key + key_aux
                     # troca estados anteriores pela uniao dos mesmos e substitui todas suas ocorrencias no automato
                     self.states = list(filter(lambda state: state != key and state != key_aux, self.states))
-                    self.states.append(newState)
+                    self.states.append(new_state)
                     if key in self.finals or key_aux in self.finals:
                         self.finals = list(filter(lambda state: state != key and state != key_aux, self.finals))
-                        self.finals.append(newState)
+                        self.finals.append(new_state)
                     if key == self.initial or key_aux == self.initial:
-                        self.initial = newState
+                        self.initial = new_state
                     new_transitions = []
                     for transition in self.transitions:
                         if transition[0] == key or transition[0] == key_aux:
-                            transition = (newState, transition[1], transition[2])
+                            transition = (new_state, transition[1], transition[2])
                         if transition[2] == key or transition[2] == key_aux:
-                            transition = (transition[0], transition[1], newState)
+                            transition = (transition[0], transition[1], new_state)
                         new_transitions.append(transition)
                     self.transitions = list(dict.fromkeys(new_transitions))
 
@@ -224,19 +226,20 @@ class Afd:
             response[word] = self.validate_word(word)
         return response
 
-    def generate_graphviz(self):
-        # só colar a string gerada no https://dreampuf.github.io/GraphvizOnline
-        graph = 'digraph {\nranksep=0.5 size=\"8, 8\"\nrankdir=LR\nInitial [label="" fontsize=14.0 shape=point]\n'
+    def generate_graphviz(self, name):
+        # só colar o graph_txt no https://dreampuf.github.io/GraphvizOnline
+        graph_txt = 'digraph {\nranksep=0.5 size=\"8, 8\"\nrankdir=LR\nInitial [label="" fontsize=14.0 shape=point]\n'
         for state in self.states:
             if state in self.finals:
-                graph += f'{state} [fontsize=14.0 shape=doublecircle]\n'
+                graph_txt += f'{state} [fontsize=14.0 shape=doublecircle]\n'
             else:
-                graph += f'{state} [fontsize=14.0 shape=circle]\n'
-        graph += f"Initial -> {self.initial} [arrowsize=0.85]\n"
+                graph_txt += f'{state} [fontsize=14.0 shape=circle]\n'
+        graph_txt += f"Initial -> {self.initial} [arrowsize=0.85]\n"
         for transition in self.transitions:
-            graph += f'	{transition[0]} -> {transition[2]} [label=\" {transition[1]} \" arrowsize=0.85 fontsize=14.0]\n'
-        graph += '}'
-        print(graph)
+            graph_txt += f'	{transition[0]} -> {transition[2]} [label=\" {transition[1]} \" arrowsize=0.85 fontsize=14.0]\n'
+        graph_txt += '}'
+        graph, = pydot.graph_from_dot_data(graph_txt)
+        graph.write_png(f'{name}.png')
 
 
 if __name__ == '__main__':
@@ -271,11 +274,11 @@ if __name__ == '__main__':
          ('q2', 'T', 'q2'), ('q2', 'F', 'q3'), ('q3', 'A', 'q2'), ('q3', 'Z', 'q3'), ('q3', 'T', 'q3'),
          ('q3', 'L', 'q4'), ('q4', 'A', 'q2'), ('q4', 'Z', 'q4'), ('q4', 'T', 'q4'), ('q4', 'L', 'q4')]
     My_Afd = Afd(M, S, A, i, F, T)
-    acceptedWordsList = ['ACFL', 'ZTACFL', 'LACFLL', 'AZCTFL', 'LZT']
-    rejectedWordsList = ['AR', 'ACFR', 'F', 'ACA', 'ACL']
-    print(My_Afd.validate_words(acceptedWordsList))
-    print(My_Afd.validate_words(rejectedWordsList))
+    accepted_words_list = ['ACFL', 'ZTACFL', 'LACFLL', 'AZCTFL', 'LZT']
+    rejected_words_list = ['AR', 'ACFR', 'F', 'ACA', 'ACL']
+    print(My_Afd.validate_words(accepted_words_list))
+    print(My_Afd.validate_words(rejected_words_list))
 
-    # My_Afd.generate_graphviz()
+    My_Afd.generate_graphviz(f'{My_Afd.name}_not_minimized')
     My_Afd.minimize()
-    # My_Afd.generate_graphviz()
+    My_Afd.generate_graphviz(f'{My_Afd.name}_minimized')
