@@ -1,6 +1,6 @@
 from afd import Afd
 
-from types import *
+from afd_types import *
 
 if __name__ == '__main__':
     M = 'AFDexemplo1'

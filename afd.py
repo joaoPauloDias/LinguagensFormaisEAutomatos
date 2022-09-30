@@ -1,4 +1,8 @@
-from types import *
+import copy
+
+from afd_types import *
+
+from utils import dfs
 
 import pydot
 
@@ -272,10 +276,3 @@ class Afd:
         graph_txt += '}'
         graph = pydot.graph_from_dot_data(graph_txt)[0]
         graph.write_png(f'{name}.png')
-
-
-def dfs(visited, graph, node):
-    if node not in visited:
-        visited.add(node)
-        for neighbour in graph[node]:
-            dfs(visited, graph, neighbour)
