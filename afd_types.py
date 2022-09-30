@@ -1,8 +1,8 @@
-from typing import Dict, List, Tuple
+import typing
 
 State = str
 Symbol = str
-DistinctionTable = Dict[State, Dict[State, List[State]]]
-Transitions = List[Tuple[State, Symbol, State]]
-StringList = List[str]
-StateGraph = Dict[State, List[State]]
+DistinctionTable = typing.Dict[State, typing.Dict[State, typing.List[State]]]
+Transitions = typing.List[typing.Tuple[State, Symbol, State]]
+StringList = typing.List[str]
+StateGraph = typing.Dict[State, typing.List[State]]

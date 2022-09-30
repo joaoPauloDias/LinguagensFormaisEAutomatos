@@ -1,7 +1,5 @@
 from afd import Afd
 
-from afd_types import *
-
 if __name__ == '__main__':
     M = 'AFDexemplo1'
     S = ['q0', 'q1', 'q2', 'q3']
