@@ -1,7 +1,30 @@
+from typing import IO
+from file_parser import FileParser
 from menu import menu
+from word_parser import WordParser
+
+
+def start(file_afd: IO, file_words: IO):
+     processed_afd = FileParser(file_afd).process_afd()
+     processed_words = WordParser(file_words).process()
+
+     print("AFD sem simplificações:")
+     print(processed_afd)
+     processed_afd.generate_graphviz(f'{processed_afd.name}_not_minimized')
+
+     processed_afd.minimize()
+
+     print("AFD com simplificações:")
+     print(processed_afd)
+     processed_afd.generate_graphviz(f'{processed_afd.name}_minimized')
+
+     print("Validade de palavras:")
+     print(processed_afd.validate_words(processed_words))
+
 
 if __name__ == '__main__':
-    menu(show=True)
+#     menu(show=True)
+
     '''
     M = 'AFDexemplo1'
     S = ['q0', 'q1', 'q2', 'q3']
