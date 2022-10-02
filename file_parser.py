@@ -37,8 +37,8 @@ class FileParser():
         return FileParser.parse_to_list(symbol_substr)
 
     def __get_initial_state(self) -> State:
-        symbol_substr: State = self.__get_sublist(2)
-        return symbol_substr[1]
+        symbol_substr: State = self.__get_sublist(3)
+        return symbol_substr
 
     def __get_final_states(self) -> List[State]:
         state_substr: State = self.__get_sublist(4)
@@ -60,7 +60,7 @@ class FileParser():
 
     @staticmethod
     def parse_transition(transition: str) -> Transition:
-        transition.replace("(", "").replace(")", "")
+        transition = transition.replace("(", "").replace(")", "")
         return tuple(transition.split(","))
 
 
@@ -68,4 +68,4 @@ if __name__ == "__main__":
     arquivo = open("exemplo.txt", mode="r")
     meu_processador = FileParser(arquivo)
     afd_gerado = meu_processador.process()
-    
+    print(afd_gerado)

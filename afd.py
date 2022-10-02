@@ -1,4 +1,6 @@
+from ast import operator
 import copy
+import functools
 from typing import List, Dict
 
 import pydot
@@ -24,6 +26,17 @@ class Afd:
         self.finals = finals
         self.transitions = transitions
 
+    def __repr__(self) -> str:
+        new_line = "\n"
+        return f"""
+{self.name}
+S: {self.states}
+A: {self.alphabet}
+i: {self.initial}
+F: {self.finals}
+
+{new_line.join(map(lambda t: t.__repr__(), self.transitions))}
+        """
     def remove_state(self, state: State):
         if state in self.states:
             self.states.remove(state)
