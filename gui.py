@@ -3,9 +3,11 @@ import os.path
 import tkinter as tk
 import customtkinter as ctk
 from tkinter import filedialog
+from tkinter import ttk
 from tkinter.font import Font
 from typing import IO, Callable, Dict, List, Optional, Tuple
-# import pyglet
+
+from sqlalchemy import column
 
 X = int
 
@@ -15,22 +17,15 @@ Coord = Tuple[X, Y]
 
 
 class FileButton:
-    __PAD_X = 10
-    __PAD_Y = 6
-    # name: str = "Selecionar o arquivo "
-    # label: tk.Label = None
-    # button: tk.Button = None
-    # master: tk.Tk = None
-    # file: Optional[IO] = None
-    # update_subject = None
+    __PAD_X = 30
 
-    def __init__(self, name_complement: str, master: tk.Tk, coord: Coord, update_subject, style):
+    def __init__(self, name_complement: str, master: tk.Tk, coord: Coord, update_subject):
         self.master = master
         self.name = "Selecionar o arquivo " + name_complement
         self.file: Optional[IO] = None
 
         self.label = ctk.CTkLabel(self.master, text=self.name,
-                              padx=FileButton.__PAD_X, pady=FileButton.__PAD_Y,
+                              padx=FileButton.__PAD_X, pady=Gui.PAD_Y,
                               justify=tk.LEFT)
         self.label.grid(column=coord[1], row=coord[0], sticky=tk.W)
 
@@ -38,7 +33,7 @@ class FileButton:
             self.master, text="Carregar", command=self.open_dialog)
         self.button.grid(
             column=coord[1] + 1, row=coord[0],
-            padx=FileButton.__PAD_X, pady=FileButton.__PAD_Y)
+            padx=FileButton.__PAD_X, pady=Gui.PAD_Y)
 
         self.update_subject = update_subject
 
@@ -49,29 +44,19 @@ class FileButton:
 
 
 class Gui:
-    # window: tk.Tk = None
-    # fbtn_afd: FileButton = None
-    # fbtn: FileButton = None
-    # start = None
-    # file_subject: List[FileButton] = []
-    __DEFAULT_FONT: Font = None
-
-    DEFAULT_PROPS = {
-        "bd": 2,
-        "relief": "solid"
-    }
+    PAD_Y = 12
 
     def __init__(self, start: Callable[[IO, IO], None]):
         ctk.set_appearance_mode("system")
         ctk.set_default_color_theme("blue")
         self.start = start
-        # self.window = tk.Tk()
-        self.window = ctk.CTk()
-        self.window.title("Simplificador de Autômatos")
-        self.window.geometry("600x400+200+200")
-        self.window.iconbitmap(True, "assets/icon.ico")
 
-        Gui.__set_font()
+        self.window = ctk.CTk()
+        self.window.resizable(False, True)
+        self.window.title("Simplificador de Autômatos")
+        self.window.geometry("500x500+200+200")
+        self.window.columnconfigure(0, weight=1)
+        self.window.iconbitmap(True, "assets/icon.ico")
 
         self.file_subject: List[IO] = []
         self.fbtn_afd = self.make_file_btn("do AFD", (0, 0))
@@ -81,21 +66,30 @@ class Gui:
                                    state=tk.DISABLED, command=self.__gui_start)
         self.start_btn.grid(row=2, columnspan=2)
 
+        self.result = None
+
         self.window.mainloop()
 
     def __gui_start(self):
         self.start(self.fbtn_afd.file, self.fbtn_words.file, self)
 
     def display_empty(self):
-        tk.Label(self.window, text="A linguagem gerada é vazia.").grid(
-            columnspan=2)
+        try:
+            self.result.grid_remove()
+        finally:
+            self.result = ctk.CTkLabel(self.window, text="A linguagem gerada é vazia.")
+            self.result.grid(columnspan=2, pady=Gui.PAD_Y)
 
     def display_valid(self, words_dict: Dict[str, bool]):
-        ValidWordGui(self.window, words_dict).render()
+        try:
+            self.result.grid_remove()
+        finally:
+            self.result = ValidWordGui(self.window, words_dict)
+            self.result.render()
 
     def make_file_btn(self, name: str, coord: Coord):
         new_button = FileButton(name, self.window, coord,
-                                self.update_subject, Gui.DEFAULT_PROPS)
+                                self.update_subject)
         self.file_subject.append(new_button)
         return new_button
 
@@ -113,41 +107,35 @@ class Gui:
         else:
             self.start_btn.configure(state=ctk.DISABLED)
 
-        print(self.start_btn["state"])
-
-    @staticmethod
-    def __set_font():
-        Gui.__DEFAULT_FONT = Font(
-            family="Comic Sans MS",
-            size=12,
-            weight="normal"
-        )
-
-        Gui.DEFAULT_PROPS["font"] = Gui.__DEFAULT_FONT
-
 
 class ValidWordGui(ctk.CTkFrame):
     def __init__(self, master, valid_words: Dict[str, bool]):
         super().__init__(master)
 
         self.valid_words = valid_words
-        self.grid(columnspan=2)
+        self.grid(columnspan=2, pady=Gui.PAD_Y)
 
-        self.header_name = "Resultado das palavras"
-        self.header = ctk.CTkLabel(self, text=self.header_name)
-        self.header.grid(row=0, column=0, padx=10, pady=10)
+        self.table = ttk.Treeview(self, columns=(1,2), show="headings", height=15)
+        self.table.grid()
+
+        self.table.column(1, anchor=tk.CENTER)
+        self.table.column(2, anchor=tk.CENTER)
+
+        self.table.heading(1, text="Palavra")
+        self.table.heading(2, text="Pertinência")
+
+        self.scrollbar = ctk.CTkScrollbar(self, command=self.table.yview)
+        self.scrollbar.grid(row=0, column=1, sticky="ns")
+
+        self.table.configure(yscrollcommand=self.scrollbar.set)
+
 
     def render(self):
-        ctk.CTkLabel(self, text="Palavra").grid(column=0, row=1)
-        ctk.CTkLabel(self, text="Pertinência").grid(column=1, row=1)
+        for result in self.valid_words.items():
+            self.table.insert("", "end", values=(result[0], ValidWordGui.get_validation(result[1])))
+        pass
 
-        i = 2
-        for key, value in self.valid_words.items():
-            ctk.CTkLabel(self, text=key).grid(column=0, row=i)
-            ctk.CTkLabel(self, text=ValidWordGui.get_validation(
-                value)).grid(column=1, row=i)
-            i += 1
-
+    @staticmethod
     def get_validation(value: bool):
         if value:
             return "Percente"
@@ -156,4 +144,4 @@ class ValidWordGui(ctk.CTkFrame):
 
 
 if __name__ == "__main__":
-    Gui(None)
+    gui = Gui(None)
