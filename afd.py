@@ -8,12 +8,12 @@ from utils import dfs
 
 
 class Afd:
-    name: str = ""
-    states: List[State] = []
-    alphabet: List[Symbol] = []
-    initial: State = str(None)
-    finals: List[State] = []
-    transitions: Transitions = []
+    # name: str = ""
+    # states: List[State] = []
+    # alphabet: List[Symbol] = []
+    # initial: State = str(None)
+    # finals: List[State] = []
+    # transitions: Transitions = []
 
     def __init__(self, name: str, states: List[State], alphabet: List[Symbol],
                  initial: State, finals: List[State], transitions: Transitions):
