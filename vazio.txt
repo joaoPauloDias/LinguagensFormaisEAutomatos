@@ -1,0 +1,32 @@
+AFDforno
+S: q0,q1,q2,q3,q4,q5
+A: A,F,C,R,T,Z,L
+i: q0
+F: q5
+
+(q0,Z,q0)
+(q0,T,q0)
+(q0,L,q0)
+(q0,A,q1)
+(q1,F,q0)
+(q1,Z,q1)
+(q1,T,q1)
+(q1,C,q2)
+(q2,R,q1)
+(q2,Z,q2)
+(q2,T,q2)
+(q2,F,q3)
+(q3,A,q2)
+(q3,Z,q3)
+(q3,T,q3)
+(q3,L,q4)
+(q4,A,q2)
+(q4,Z,q4)
+(q4,T,q4)
+(q4,L,q4)
+
+
+
+
+
+

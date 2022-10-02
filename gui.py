@@ -2,7 +2,7 @@ import os.path
 import tkinter as tk
 from tkinter import filedialog
 from tkinter.font import Font
-from typing import IO, Callable, List, Optional, Tuple
+from typing import IO, Callable, Dict, List, Optional, Tuple
 # import pyglet
 
 X = int
@@ -13,7 +13,8 @@ Coord = Tuple[X, Y]
 
 
 class FileButton:
-    __PAD = 7
+    __PAD_X = 10
+    __PAD_Y = 6
     # name: str = "Selecionar o arquivo "
     # label: tk.Label = None
     # button: tk.Button = None
@@ -27,15 +28,17 @@ class FileButton:
         self.file: Optional[IO] = None
 
         self.label = tk.Label(self.master, text=self.name,
-                              padx=FileButton.__PAD, pady=FileButton.__PAD,
+                              padx=FileButton.__PAD_X, pady=FileButton.__PAD_Y,
+                              justify=tk.LEFT,
                               **style)
-        self.label.grid(column=coord[1], row=coord[0])
+        self.label.grid(column=coord[1], row=coord[0], sticky=tk.W)
 
         self.button = tk.Button(
             self.master, text="Carregar", command=self.open_dialog,
             **style)
         self.button.grid(
-            column=coord[1] + 1, row=coord[0], padx=FileButton.__PAD, pady=FileButton.__PAD)
+            column=coord[1] + 1, row=coord[0],
+            padx=FileButton.__PAD_X, pady=FileButton.__PAD_Y)
 
         self.update_subject = update_subject
 
@@ -55,8 +58,7 @@ class Gui:
 
     DEFAULT_PROPS = {
         "bd": 2,
-        "relief": "solid",
-        "anchor": tk.W
+        "relief": "solid"
     }
 
     def __init__(self, start: Callable[[IO, IO], None]):
@@ -73,13 +75,21 @@ class Gui:
         self.fbtn_words = self.make_file_btn("da lista de palavras", (1, 0))
 
         self.start_btn = tk.Button(self.window, text="Iniciar",
-                                   state=tk.DISABLED, command=self.__gui_start)
-        self.start_btn.grid(column=0, row=2)
+                                   state=tk.DISABLED, command=self.__gui_start,
+                                   **Gui.DEFAULT_PROPS)
+        self.start_btn.grid(row=2, columnspan=2)
 
         self.window.mainloop()
 
     def __gui_start(self):
-        self.start(self.fbtn_afd.file, self.fbtn_words.file)
+        self.start(self.fbtn_afd.file, self.fbtn_words.file, self)
+
+    def display_empty(self):
+        tk.Label(self.window, text="A linguagem gerada é vazia.").grid(
+            columnspan=2)
+
+    def display_valid(self, words_dict: Dict[str, bool]):
+        ValidWordGui(self.window, words_dict).render()
 
     def make_file_btn(self, name: str, coord: Coord):
         new_button = FileButton(name, self.window, coord,
@@ -92,8 +102,7 @@ class Gui:
 
     def update_subject(self):
         enable_start = True
-        cu = r'assets\\fonts\\helvetica-neue\\HelveticaNeue-Regular.otf'
-        print(cu)
+
         for observer in self.file_subject:
             enable_start = enable_start and observer.file
 
@@ -105,12 +114,36 @@ class Gui:
     @staticmethod
     def __set_font():
         Gui.__DEFAULT_FONT = Font(
-            family="Verdana",
+            family="Comic Sans MS",
             size=12,
             weight="normal"
         )
 
         Gui.DEFAULT_PROPS["font"] = Gui.__DEFAULT_FONT
+
+
+class ValidWordGui():
+    def __init__(self, master, valid_words: Dict[str, bool]):
+        self.valid_words = valid_words
+        self.frame = tk.Frame(master)
+
+    def render(self):
+        self.frame.grid(columnspan=2)
+        tk.Label(self.frame, text="Palavra").grid(column=0, row=0)
+        tk.Label(self.frame, text="Pertinência").grid(column=1, row=0)
+
+        i = 1
+        for key, value in self.valid_words.items():
+            tk.Label(self.frame, text=key).grid(column=0, row=i)
+            tk.Label(self.frame, text=ValidWordGui.get_validation(
+                value)).grid(column=1, row=i)
+            i += 1
+
+    def get_validation(value: bool):
+        if value:
+            return "Percente"
+        else:
+            return "Não pertence"
 
 
 if __name__ == "__main__":

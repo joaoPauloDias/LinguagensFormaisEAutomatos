@@ -15,7 +15,6 @@ class FileParser():
         return self.lines
 
     def process_afd(self) -> Afd:
-
         return Afd(
             self.__get_name(),
             self.__get_states(),
@@ -54,7 +53,8 @@ class FileParser():
         return list(
             filter(None, map
             (lambda s: FileParser.parse_transition(s),
-             transitions_in_str))
+             transitions_in_str)
+             )
         )
 
     @staticmethod
@@ -65,8 +65,9 @@ class FileParser():
     def parse_transition(transition: str) -> Transition:
         if transition == '':
             return
-        transition = transition.replace("(", "").replace(")", "")
-        return tuple(transition.split(","))
+        else:
+            transition = transition.replace("(", "").replace(")", "")
+            return tuple(transition.split(","))
 
 
 if __name__ == "__main__":

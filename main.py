@@ -5,7 +5,7 @@ from menu import menu
 from word_parser import WordParser
 
 
-def start(file_afd: IO, file_words: IO):
+def start(file_afd: IO, file_words: IO, gui:Gui):
      processed_afd = FileParser(file_afd).process_afd()
      processed_words = WordParser(file_words).process()
 
@@ -13,14 +13,22 @@ def start(file_afd: IO, file_words: IO):
      print(processed_afd)
      processed_afd.generate_graphviz(f'{processed_afd.name}_not_minimized')
 
-     processed_afd.minimize()
+     if processed_afd.check_empty_language():
+          print("A linguagem é vazia.")
+          gui.display_empty()
+     else:
+          processed_afd.minimize()
 
-     print("AFD com simplificações:")
-     print(processed_afd)
-     processed_afd.generate_graphviz(f'{processed_afd.name}_minimized')
+          print("AFD com simplificações:")
+          print(processed_afd)
+          processed_afd.generate_graphviz(f'{processed_afd.name}_minimized')
 
-     print("Validade de palavras:")
-     print(processed_afd.validate_words(processed_words))
+          valid_word_dict = processed_afd.validate_words(processed_words)
+          print("Validade de palavras:")
+          print(valid_word_dict)
+
+          gui.display_valid(valid_word_dict)
+
 
 
 if __name__ == '__main__':
