@@ -1,5 +1,7 @@
+import copy
 import os.path
 import tkinter as tk
+import customtkinter as ctk
 from tkinter import filedialog
 from tkinter.font import Font
 from typing import IO, Callable, Dict, List, Optional, Tuple
@@ -27,15 +29,13 @@ class FileButton:
         self.name = "Selecionar o arquivo " + name_complement
         self.file: Optional[IO] = None
 
-        self.label = tk.Label(self.master, text=self.name,
+        self.label = ctk.CTkLabel(self.master, text=self.name,
                               padx=FileButton.__PAD_X, pady=FileButton.__PAD_Y,
-                              justify=tk.LEFT,
-                              **style)
+                              justify=tk.LEFT)
         self.label.grid(column=coord[1], row=coord[0], sticky=tk.W)
 
-        self.button = tk.Button(
-            self.master, text="Carregar", command=self.open_dialog,
-            **style)
+        self.button = ctk.CTkButton(
+            self.master, text="Carregar", command=self.open_dialog)
         self.button.grid(
             column=coord[1] + 1, row=coord[0],
             padx=FileButton.__PAD_X, pady=FileButton.__PAD_Y)
@@ -62,8 +62,11 @@ class Gui:
     }
 
     def __init__(self, start: Callable[[IO, IO], None]):
+        ctk.set_appearance_mode("system")
+        ctk.set_default_color_theme("blue")
         self.start = start
-        self.window = tk.Tk()
+        # self.window = tk.Tk()
+        self.window = ctk.CTk()
         self.window.title("Simplificador de Autômatos")
         self.window.geometry("600x400+200+200")
         self.window.iconbitmap(True, "assets/icon.ico")
@@ -74,9 +77,8 @@ class Gui:
         self.fbtn_afd = self.make_file_btn("do AFD", (0, 0))
         self.fbtn_words = self.make_file_btn("da lista de palavras", (1, 0))
 
-        self.start_btn = tk.Button(self.window, text="Iniciar",
-                                   state=tk.DISABLED, command=self.__gui_start,
-                                   **Gui.DEFAULT_PROPS)
+        self.start_btn = ctk.CTkButton(self.window, text="Iniciar",
+                                   state=tk.DISABLED, command=self.__gui_start)
         self.start_btn.grid(row=2, columnspan=2)
 
         self.window.mainloop()
@@ -107,9 +109,11 @@ class Gui:
             enable_start = enable_start and observer.file
 
         if enable_start:
-            self.start_btn["state"] = tk.NORMAL
+            self.start_btn.configure(state=ctk.NORMAL)
         else:
-            self.start_btn["state"] = tk.DISABLED
+            self.start_btn.configure(state=ctk.DISABLED)
+
+        print(self.start_btn["state"])
 
     @staticmethod
     def __set_font():
@@ -122,20 +126,25 @@ class Gui:
         Gui.DEFAULT_PROPS["font"] = Gui.__DEFAULT_FONT
 
 
-class ValidWordGui():
+class ValidWordGui(ctk.CTkFrame):
     def __init__(self, master, valid_words: Dict[str, bool]):
+        super().__init__(master)
+
         self.valid_words = valid_words
-        self.frame = tk.Frame(master)
+        self.grid(columnspan=2)
+
+        self.header_name = "Resultado das palavras"
+        self.header = ctk.CTkLabel(self, text=self.header_name)
+        self.header.grid(row=0, column=0, padx=10, pady=10)
 
     def render(self):
-        self.frame.grid(columnspan=2)
-        tk.Label(self.frame, text="Palavra").grid(column=0, row=0)
-        tk.Label(self.frame, text="Pertinência").grid(column=1, row=0)
+        ctk.CTkLabel(self, text="Palavra").grid(column=0, row=1)
+        ctk.CTkLabel(self, text="Pertinência").grid(column=1, row=1)
 
-        i = 1
+        i = 2
         for key, value in self.valid_words.items():
-            tk.Label(self.frame, text=key).grid(column=0, row=i)
-            tk.Label(self.frame, text=ValidWordGui.get_validation(
+            ctk.CTkLabel(self, text=key).grid(column=0, row=i)
+            ctk.CTkLabel(self, text=ValidWordGui.get_validation(
                 value)).grid(column=1, row=i)
             i += 1
 
