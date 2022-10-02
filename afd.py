@@ -216,31 +216,65 @@ F: {self.finals}
     def unify_states(self) -> None:
         # cria a tabela de distincao preenchida
         table: DistinctionTable = self.make_distict_table()
+
+        # cria uma lista com listas dos estados equivalentes entre si
+        united_states = []
+
         # para cada celula da tabela
         for key in table:
             for key_aux in table[key]:
                 # se a celula nao tiver sido marcada como distinta
                 if 'X' not in table[key][key_aux]:
-                    # assume que os estados que identificam a celula são iguais e cria um estado a partir da
-                    # união deles
-                    new_state = key + key_aux
-                    # troca estados anteriores pela uniao dos mesmos e substitui todas suas ocorrencias no automato
-                    self.states = list(filter(lambda state: state != key and state != key_aux, self.states))
-                    self.states.append(new_state)
-                    if key in self.finals or key_aux in self.finals:
-                        self.finals = list(filter(lambda state: state != key and state != key_aux, self.finals))
-                        self.finals.append(new_state)
-                    if key == self.initial or key_aux == self.initial:
-                        self.initial = new_state
-                    new_transitions = []
-                    for transition in self.transitions:
-                        if transition[0] == key or transition[0] == key_aux:
-                            transition = (new_state, transition[1], transition[2])
-                        if transition[2] == key or transition[2] == key_aux:
-                            transition = (transition[0], transition[1], new_state)
-                        new_transitions.append(transition)
 
-                    self.transitions = list(dict.fromkeys(new_transitions))
+                    check = False
+                    # percorre a lista de listas estados semelhantes
+                    for united_state in united_states:
+                        # se a lista iterado contiver algum dos estados da celula
+                        # por transitividade podemos adicionar as duas
+                        if key in united_state or key_aux in united_state:
+                            check = True
+                            united_state.append(key_aux)
+                            united_state.append(key)
+                    if not check:
+                        # caso nenhuma lista ja existente contenha alguma das chaves
+                        # adiciona as chaves em uma nova lista de estados semelhantes
+                        united_states.append([key, key_aux])
+
+        # para cada conjunto de estados equivalentes entre si
+        for united_state in united_states:
+            # remove repeticao do conjunto
+            united_state = [*set(united_state)]
+            # cria o nome do novo estado a partir da concatenacao dos estados que o compoe
+            new_state = ''.join(united_state)
+
+            # remove estados que foram concatenados e adiciona concatenacao deles
+            self.states = list(filter(lambda state: state not in united_state, self.states))
+            self.states.append(new_state)
+
+            # caso houver algum estado final dentre os que foram concatenados
+            # adiciona estado conglomerado nos finais e remove dos mesmos todos estados que o compoe
+            for partial_state in united_state:
+                if partial_state in self.finals:
+                    self.finals = list(filter(lambda state: state not in united_state, self.finals))
+                    self.finals.append(new_state)
+                    break
+
+            # caso houver algum estado inicial dentre os que foram concatenados
+            # atualiza estado inicial para o estado uniao
+            if self.initial in united_state:
+                self.initial = new_state
+
+            new_transitions = []
+
+            # atualiza transicoes
+            for transition in self.transitions:
+                if transition[0] in united_state:
+                    transition = (new_state, transition[1], transition[2])
+                if transition[2] in united_state:
+                    transition = (transition[0], transition[1], new_state)
+                new_transitions.append(transition)
+            # remove repeticoes das transicoes
+            self.transitions = list(dict.fromkeys(new_transitions))
 
     def minimize(self) -> None:
         # remove estados inalcacaveis do automato
