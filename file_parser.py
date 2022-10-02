@@ -11,7 +11,10 @@ class FileParser():
         self.file: Optional[IO] = file.read()
         self.lines = str(self.file).split("\n")
 
-    def process(self) -> Afd:
+    def process_words(self):
+        return self.lines
+
+    def process_afd(self) -> Afd:
 
         return Afd(
             self.__get_name(),
@@ -49,9 +52,9 @@ class FileParser():
         transitions_in_str = self.lines[break_point + 1:]
 
         return list(
-            map
+            filter(None, map
             (lambda s: FileParser.parse_transition(s),
-             transitions_in_str)
+             transitions_in_str))
         )
 
     @staticmethod
@@ -60,6 +63,8 @@ class FileParser():
 
     @staticmethod
     def parse_transition(transition: str) -> Transition:
+        if transition == '':
+            return
         transition = transition.replace("(", "").replace(")", "")
         return tuple(transition.split(","))
 
@@ -67,5 +72,4 @@ class FileParser():
 if __name__ == "__main__":
     arquivo = open("exemplo.txt", mode="r")
     meu_processador = FileParser(arquivo)
-    afd_gerado = meu_processador.process()
-    print(afd_gerado)
+    afd_gerado = meu_processador.process_afd()

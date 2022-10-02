@@ -37,6 +37,7 @@ F: {self.finals}
 
 {new_line.join(map(lambda t: t.__repr__(), self.transitions))}
         """
+
     def remove_state(self, state: State):
         if state in self.states:
             self.states.remove(state)
@@ -157,9 +158,9 @@ F: {self.finals}
         """
         Monta a tabela triangular de distinção dos estados.
         É arranjada do seguinte modo:
-        I s
-        I s s
         I s s s
+        I s s
+        I s
           J J J
         """
         table: DistinctionTable = {}
@@ -250,6 +251,15 @@ F: {self.finals}
         self.unify_states()
         # remove estados inuteis
         self.remove_useless_states()
+
+    def print_afd(self) -> None:
+        print(f"S: {self.states}")
+        print(f"A: {self.alphabet}")
+        print(f"i: {self.initial}")
+        print(f"F: {self.finals}")
+        print("Transicoes:")
+        for transition in self.transitions:
+            print(transition)
 
     def validate_word(self, word: str) -> bool:
         state = self.initial

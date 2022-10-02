@@ -1,6 +1,8 @@
-from afd import Afd
+from menu import menu
 
 if __name__ == '__main__':
+    menu(show=True)
+    '''
     M = 'AFDexemplo1'
     S = ['q0', 'q1', 'q2', 'q3']
     A = ['a', 'b']
@@ -47,3 +49,4 @@ if __name__ == '__main__':
     My_Afd.generate_graphviz(f'{My_Afd.name}_not_minimized')
     My_Afd.minimize()
     My_Afd.generate_graphviz(f'{My_Afd.name}_minimized')
+    '''
