@@ -1,3 +1,6 @@
+# Autores:
+# Eduardo Mattje, João Paulo Dias, Tomás Trindade
+
 from typing import IO
 from file_parser import FileParser
 from gui import Gui

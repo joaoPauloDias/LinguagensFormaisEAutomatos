@@ -1,0 +1,6 @@
+O executável está na pasta
+Uma pasta images precisa estar na mesma pasta do executável
+Caso queira rodar o main diretamente pelo python, são necessárias as seguintes bibliotecas:
+  -graphviz
+  -pydot
+Que podem ser obtidas por meio do pip install
