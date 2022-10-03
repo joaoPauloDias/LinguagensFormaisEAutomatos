@@ -1,6 +1,4 @@
-from ast import operator
 import copy
-import functools
 from typing import List, Dict
 
 import pydot
@@ -158,9 +156,9 @@ F: {self.finals}
         """
         Monta a tabela triangular de distinção dos estados.
         É arranjada do seguinte modo:
-        I s s s
-        I s s
         I s
+        I s s
+        I s s s
           J J J
         """
         table: DistinctionTable = {}

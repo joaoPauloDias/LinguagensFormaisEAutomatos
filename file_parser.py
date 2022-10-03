@@ -6,7 +6,7 @@ from afd_types import State, Symbol, Transition, Transitions
 T = TypeVar("T")
 
 
-class FileParser():
+class FileParser:
     def __init__(self, file: Optional[IO]) -> None:
         self.file: Optional[IO] = file.read()
         self.lines = str(self.file).split("\n")
@@ -15,7 +15,6 @@ class FileParser():
         return self.lines
 
     def process_afd(self) -> Afd:
-
         return Afd(
             self.__get_name(),
             self.__get_states(),
@@ -52,9 +51,11 @@ class FileParser():
         transitions_in_str = self.lines[break_point + 1:]
 
         return list(
-            filter(None, map
-            (lambda s: FileParser.parse_transition(s),
-             transitions_in_str))
+            filter(None, map(
+                lambda s: FileParser.parse_transition(s),
+                transitions_in_str
+            )
+                   )
         )
 
     @staticmethod
@@ -65,8 +66,9 @@ class FileParser():
     def parse_transition(transition: str) -> Transition:
         if transition == '':
             return
-        transition = transition.replace("(", "").replace(")", "")
-        return tuple(transition.split(","))
+        else:
+            transition = transition.replace("(", "").replace(")", "")
+            return tuple(transition.split(","))
 
 
 if __name__ == "__main__":
