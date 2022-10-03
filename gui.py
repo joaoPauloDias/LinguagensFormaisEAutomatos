@@ -1,13 +1,9 @@
-import copy
-import os.path
 import tkinter as tk
-import customtkinter as ctk
 from tkinter import filedialog
 from tkinter import ttk
-from tkinter.font import Font
-from typing import IO, Callable, Dict, List, Optional, Tuple
+from typing import IO, Dict, List, Optional, Tuple
 
-from sqlalchemy import column
+import customtkinter as ctk
 
 X = int
 
@@ -25,8 +21,8 @@ class FileButton:
         self.file: Optional[IO] = None
 
         self.label = ctk.CTkLabel(self.master, text=self.name,
-                              padx=FileButton.__PAD_X, pady=Gui.PAD_Y,
-                              justify=tk.LEFT)
+                                  padx=FileButton.__PAD_X, pady=Gui.PAD_Y,
+                                  justify=tk.LEFT)
         self.label.grid(column=coord[1], row=coord[0], sticky=tk.W)
 
         self.button = ctk.CTkButton(
@@ -46,7 +42,7 @@ class FileButton:
 class Gui:
     PAD_Y = 12
 
-    def __init__(self, start: Callable[[IO, IO], None]):
+    def __init__(self, start):
         ctk.set_appearance_mode("system")
         ctk.set_default_color_theme("blue")
         self.start = start
@@ -58,12 +54,12 @@ class Gui:
         self.window.columnconfigure(0, weight=1)
         self.window.iconbitmap(True, "assets/icon.ico")
 
-        self.file_subject: List[IO] = []
+        self.file_subject: List[FileButton] = []
         self.fbtn_afd = self.make_file_btn("do AFD", (0, 0))
         self.fbtn_words = self.make_file_btn("da lista de palavras", (1, 0))
 
         self.start_btn = ctk.CTkButton(self.window, text="Iniciar",
-                                   state=tk.DISABLED, command=self.__gui_start)
+                                       state=tk.DISABLED, command=self.__gui_start)
         self.start_btn.grid(row=2, columnspan=2)
 
         self.result = None
@@ -93,7 +89,8 @@ class Gui:
         self.file_subject.append(new_button)
         return new_button
 
-    def file_label(self, complement):
+    @staticmethod
+    def file_label(complement):
         return f"Selecionar o arquivo do {complement}"
 
     def update_subject(self):
@@ -115,7 +112,7 @@ class ValidWordGui(ctk.CTkFrame):
         self.valid_words = valid_words
         self.grid(columnspan=2, pady=Gui.PAD_Y)
 
-        self.table = ttk.Treeview(self, columns=(1,2), show="headings", height=15)
+        self.table = ttk.Treeview(self, columns=(1, 2), show="headings", height=15)
         self.table.grid()
 
         self.table.column(1, anchor=tk.CENTER)
@@ -128,7 +125,6 @@ class ValidWordGui(ctk.CTkFrame):
         self.scrollbar.grid(row=0, column=1, sticky="ns")
 
         self.table.configure(yscrollcommand=self.scrollbar.set)
-
 
     def render(self):
         for result in self.valid_words.items():
