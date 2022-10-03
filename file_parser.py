@@ -72,6 +72,6 @@ class FileParser:
 
 
 if __name__ == "__main__":
-    arquivo = open("exemplo.txt", mode="r")
+    arquivo = open("automato.txt", mode="r")
     meu_processador = FileParser(arquivo)
     afd_gerado = meu_processador.process_afd()
